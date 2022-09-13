@@ -6,6 +6,7 @@ use ic_cdk::{
 use ic_cdk_macros::*;
 use motoko::{
     ast::Delim,
+    check::parse,
     vm_types::{Core, Limits},
 };
 use std::cell::{Cell, RefCell};
@@ -22,7 +23,7 @@ fn init() {
 
 #[query(manual_reply = true)]
 fn read() -> ManualReply<Nat> {
-    CORE.with(|core| ManualReply::one(Nat::from(core.borrow().counts.redex)))
+    CORE.with(|core| ManualReply::one(Nat::from(core.borrow().counts.step)))
 }
 
 #[update]
@@ -30,4 +31,17 @@ fn step() {
     let mut limits = Limits::none();
     limits.step_redex(1);
     CORE.with(|core| core.borrow_mut().step(&limits).unwrap());
+}
+
+#[update]
+fn load(program: String) {
+    let mut limits = Limits::none();
+    limits.step_redex(1);
+    let p = parse(&program).unwrap();
+    CORE.with(|core| *core.borrow_mut() = Core::new(p))
+}
+
+#[ic_cdk_macros::query]
+fn greet(name: String) -> String {
+    format!("Hello, {}!", name)
 }

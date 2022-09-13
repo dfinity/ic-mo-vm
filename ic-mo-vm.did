@@ -1,0 +1,6 @@
+service : {
+    "load": (text) -> ();
+    "greet": (text) -> (text) query;
+    "step": () -> ();
+    "read": () -> (nat) query;
+}
