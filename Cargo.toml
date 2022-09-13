@@ -1,5 +1,5 @@
 [package]
-name = "ic-mo-vm"
+name = "ic_mo_vm"
 version = "0.1.0"
 authors = ["Human"]
 edition = "2018"
