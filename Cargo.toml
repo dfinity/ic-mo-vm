@@ -1,0 +1,15 @@
+[package]
+name = "ic-mo-vm"
+version = "0.1.0"
+authors = ["Human"]
+edition = "2018"
+
+[lib]
+path = "lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+motoko = "0.0.2"
+candid = "0.7.16"
+ic-cdk = "0.5.6"
+ic-cdk-macros = "0.5.6"
