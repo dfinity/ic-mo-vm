@@ -1,5 +1,5 @@
 [package]
-name = "ic-mo-vm"
+name = "ic_mo_vm"
 version = "0.1.0"
 authors = ["Human"]
 edition = "2018"
@@ -9,7 +9,7 @@ path = "lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-motoko = "0.0.2"
+motoko = "0.0.3"
 candid = "0.7.16"
 ic-cdk = "0.5.6"
 ic-cdk-macros = "0.5.6"

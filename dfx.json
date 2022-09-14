@@ -1,0 +1,23 @@
+{
+  "canisters": {
+    "ic_mo_vm": {
+      "candid": "ic-mo-vm.did",
+      "package": "ic_mo_vm",
+      "type": "rust"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "dfx": "0.11.2",
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    }
+  },
+  "version": 1
+}
