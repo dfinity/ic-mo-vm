@@ -1,6 +1,7 @@
 service : {
     "load": (text) -> ();
     "greet": (text) -> (text) query;
-    "step": () -> ();
+    "step": () -> (nat);
+    "redex": () -> (nat);
     "read": () -> (nat) query;
 }

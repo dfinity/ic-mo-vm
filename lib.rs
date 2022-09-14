@@ -7,7 +7,7 @@ use ic_cdk_macros::*;
 use motoko::{
     ast::Delim,
     check::parse,
-    vm_types::{Core, Limits},
+    vm_types::{Core, Interruption, Limit, Limits},
 };
 use std::cell::{Cell, RefCell};
 
@@ -26,22 +26,48 @@ fn read() -> ManualReply<Nat> {
     CORE.with(|core| ManualReply::one(Nat::from(core.borrow().counts.step)))
 }
 
-#[update]
-fn step() {
-    let mut limits = Limits::none();
+#[update(manual_reply = true)]
+fn step() -> ManualReply<Nat> {
     CORE.with(|core| {
-        limits.step_redex(core.borrow().counts.redex + 1);
-        core.borrow_mut().step(&limits).unwrap()
-    });
+        let limits = Limits::none().step(core.borrow().counts.step + 1);
+        loop {
+            match core.borrow_mut().step(&limits) {
+                Err(Interruption::Limit(Limit::Step)) => {
+                    break;
+                }
+                Err(e) => {
+                    println!("warning: {:?}", e);
+                    break;
+                }
+                Ok(_) => {}
+            }
+        }
+        ManualReply::one(Nat::from(core.borrow().counts.step))
+    })
+}
+
+#[update(manual_reply = true)]
+fn redex() -> ManualReply<Nat> {
+    CORE.with(|core| {
+        let limits = Limits::none().redex(core.borrow().counts.redex + 1);
+        loop {
+            match core.borrow_mut().step(&limits) {
+                Err(Interruption::Limit(Limit::Redex)) => {
+                    break;
+                }
+                Err(e) => {
+                    println!("warning: {:?}", e);
+                    break;
+                }
+                Ok(_) => {}
+            }
+        }
+        ManualReply::one(Nat::from(core.borrow().counts.redex))
+    })
 }
 
 #[update]
 fn load(program: String) {
     let p = parse(&program).unwrap();
     CORE.with(|core| *core.borrow_mut() = Core::new(p))
-}
-
-#[ic_cdk_macros::query]
-fn greet(name: String) -> String {
-    format!("Hello, {}!", name)
 }
