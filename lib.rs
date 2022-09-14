@@ -29,14 +29,14 @@ fn read() -> ManualReply<Nat> {
 #[update]
 fn step() {
     let mut limits = Limits::none();
-    limits.step_redex(1);
-    CORE.with(|core| core.borrow_mut().step(&limits).unwrap());
+    CORE.with(|core| {
+        limits.step_redex(core.borrow().counts.redex + 1);
+        core.borrow_mut().step(&limits).unwrap()
+    });
 }
 
 #[update]
 fn load(program: String) {
-    let mut limits = Limits::none();
-    limits.step_redex(1);
     let p = parse(&program).unwrap();
     CORE.with(|core| *core.borrow_mut() = Core::new(p))
 }
