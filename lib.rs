@@ -32,6 +32,9 @@ fn step() -> ManualReply<Nat> {
         let limits = Limits::none().step(core.borrow().counts.step + 1);
         loop {
             match core.borrow_mut().step(&limits) {
+                Err(Interruption::Done(_)) => {
+                    break;
+                }
                 Err(Interruption::Limit(Limit::Step)) => {
                     break;
                 }
@@ -52,6 +55,9 @@ fn redex() -> ManualReply<Nat> {
         let limits = Limits::none().redex(core.borrow().counts.redex + 1);
         loop {
             match core.borrow_mut().step(&limits) {
+                Err(Interruption::Done(_)) => {
+                    break;
+                }
                 Err(Interruption::Limit(Limit::Redex)) => {
                     break;
                 }
