@@ -1,79 +1,30 @@
-use candid::Nat;
-use ic_cdk::{
-    api::call::ManualReply,
-    export::{candid, Principal},
-};
-use ic_cdk_macros::*;
 use motoko::{
-    ast::Delim,
     check::parse,
-    vm_types::{Core, Interruption, Limit, Limits},
+    vm_types::Core,
 };
-use std::cell::{Cell, RefCell};
+use std::cell::RefCell;
 
 thread_local! {
-    static CORE: RefCell<Core> = RefCell::new(Core::new(Delim::new()));
-    static OWNER: Cell<Principal> = Cell::new(Principal::from_slice(&[]));
+    static CORE: RefCell<Core> = RefCell::new(Core::empty());
 }
 
-#[init]
-fn init() {
-    OWNER.with(|owner| owner.set(ic_cdk::api::caller()));
-}
-
-#[query(manual_reply = true)]
-fn read() -> ManualReply<Nat> {
-    CORE.with(|core| ManualReply::one(Nat::from(core.borrow().counts.step)))
-}
-
-#[update(manual_reply = true)]
-fn step() -> ManualReply<Nat> {
+fn eval_(prog: String) -> String {
     CORE.with(|core| {
-        let limits = Limits::none().step(core.borrow().counts.step + 1);
-        loop {
-            match core.borrow_mut().step(&limits) {
-                Err(Interruption::Done(_)) => {
-                    break;
-                }
-                Err(Interruption::Limit(Limit::Step)) => {
-                    break;
-                }
-                Err(e) => {
-                    println!("warning: {:?}", e);
-                    break;
-                }
-                Ok(_) => {}
-            }
-        }
-        ManualReply::one(Nat::from(core.borrow().counts.step))
+        let p = parse(&prog).expect("parse error");
+
+        let result_val =
+            core.borrow_mut().eval_prog(p).expect("eval error");
+
+        format!("{:?}", result_val)
     })
 }
 
-#[update(manual_reply = true)]
-fn redex() -> ManualReply<Nat> {
-    CORE.with(|core| {
-        let limits = Limits::none().redex(core.borrow().counts.redex + 1);
-        loop {
-            match core.borrow_mut().step(&limits) {
-                Err(Interruption::Done(_)) => {
-                    break;
-                }
-                Err(Interruption::Limit(Limit::Redex)) => {
-                    break;
-                }
-                Err(e) => {
-                    println!("warning: {:?}", e);
-                    break;
-                }
-                Ok(_) => {}
-            }
-        }
-        ManualReply::one(Nat::from(core.borrow().counts.redex))
-    })
+#[ic_cdk_macros::update]
+fn eval(prog: String) -> String {
+    eval_(prog)
 }
 
-#[update]
-fn load(program: String) {
-    let p = parse(&program).unwrap();
-    CORE.with(|core| *core.borrow_mut() = Core::new(p))
+#[ic_cdk_macros::query]
+fn eval_q(prog: String) -> String {
+    eval_(prog)
 }
