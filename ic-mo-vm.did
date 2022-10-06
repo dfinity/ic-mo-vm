@@ -1,6 +1,4 @@
 service : {
-    "load": (text) -> ();
-    "step": () -> (nat);
-    "redex": () -> (nat);
-    "read": () -> (nat) query;
+    "eval": (text) -> (text);
+    "eval_q": (text) -> (text) query;
 }
