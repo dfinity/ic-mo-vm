@@ -9,7 +9,8 @@ path = "lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-motoko = "0.0.7"
 candid = "0.7.16"
 ic-cdk = "0.5.6"
 ic-cdk-macros = "0.5.6"
+motoko = { branch = "main" , git = "https://github.com/dfinity/motoko.rs" }
+# motoko_proc_macro = { git = "https://github.com/dfinity/motoko.rs", branch = "main" }
