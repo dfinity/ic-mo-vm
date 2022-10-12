@@ -1,4 +1,4 @@
-use motoko::{ast::ToId, check::parse, shared::Share, vm_types::Core};
+use motoko::{parse, Dynamic, Core};
 use std::cell::RefCell;
 
 mod stable_map;
@@ -11,7 +11,8 @@ thread_local! {
     static CORE: RefCell<Core> = RefCell::new({
         let mut core = Core::empty();
         let ptr = core.alloc(stable_map::StableMap::shared(MAX_KEY_SIZE, MAX_VALUE_SIZE));
-        core.env.insert("stableMap".to_id(), motoko::value::Value::Pointer(ptr).share());
+        core.assign_alloc("stableMap", motoko::value::Value::Pointer(ptr));
+        core.assign("newStableMap", stable_map::NewStableMap.into_value());
         core
     });
 }

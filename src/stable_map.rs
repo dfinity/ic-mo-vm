@@ -1,17 +1,30 @@
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
 use ic_stable_structures::{DefaultMemoryImpl, StableBTreeMap};
-use motoko::vm_types::Interruption;
-use std::borrow::{Borrow, BorrowMut};
+use motoko::dynamic::Result;
+use motoko::{Core, Dynamic, Share, Shared, Value};
 use std::cell::RefCell;
-
-use motoko::dynamic::{Dynamic, Result};
-use motoko::shared::{Share, Shared};
-use motoko::value::Value;
+use std::rc::Rc;
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
+#[derive(Clone, Debug, Hash)]
+pub struct NewStableMap;
+
+impl Dynamic for NewStableMap {
+    fn call(
+        &mut self,
+        core: &mut Core,
+        _inst: &Option<motoko::ast::Inst>,
+        args: Shared<Value>,
+    ) -> Result {
+        let (max_key_size, max_value_size) = args.to_rust()?;
+        let map = StableMap::shared(max_key_size, max_value_size);
+        Ok(Value::Pointer(core.alloc(map)).share())
+    }
+}
+
 // Stable map container for MoVM
-pub struct StableMap(StableBTreeMap<Memory, String, Vec<u8>>);
+pub struct StableMap(Rc<RefCell<StableBTreeMap<Memory, String, Vec<u8>>>>);
 
 impl StableMap {
     pub fn shared(max_key_size: u32, max_value_size: u32) -> Shared<Value> {
@@ -26,13 +39,13 @@ impl StableMap {
             max_value_size,
         );
 
-        StableMap(map).into_value().share()
+        StableMap(Rc::new(RefCell::new(map))).into_value().share()
     }
 }
 
 impl Clone for StableMap {
     fn clone(&self) -> Self {
-        todo!()
+        StableMap(self.0.clone())
     }
 }
 
@@ -50,11 +63,8 @@ impl core::hash::Hash for StableMap {
 
 // Rust-Motoko bindings
 impl Dynamic for StableMap {
-    fn get_index(&self, index: Shared<Value>) -> Result {
-        let result = self
-            .0
-            .borrow()
-            .get(&index.to_rust().map_err(Interruption::ValueError)?);
+    fn get_index(&self, _core: &Core, index: Shared<Value>) -> Result {
+        let result = (&*self.0).borrow().get(&index.to_rust()?);
 
         Ok(match result {
             Some(vec) => Value::Option(Value::Blob(vec).share()),
@@ -63,11 +73,17 @@ impl Dynamic for StableMap {
         .share())
     }
 
-    fn set_index(&mut self, index: Shared<Value>, value: Shared<Value>) -> Result<()> {
-        drop(self.0.borrow_mut().insert(
-            index.to_rust().map_err(Interruption::ValueError)?,
-            value.to_rust().map_err(Interruption::ValueError)?,
-        ));
+    fn set_index(
+        &mut self,
+        _core: &mut Core,
+        index: Shared<Value>,
+        value: Shared<Value>,
+    ) -> Result<()> {
+        drop(
+            (&*self.0)
+                .borrow_mut()
+                .insert(index.to_rust()?, value.to_rust()?),
+        );
         Ok(())
     }
 }
