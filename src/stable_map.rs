@@ -43,25 +43,6 @@ impl StableMap {
     }
 }
 
-impl Clone for StableMap {
-    fn clone(&self) -> Self {
-        StableMap(self.0.clone())
-    }
-}
-
-impl core::fmt::Debug for StableMap {
-    fn fmt(&self, _f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
-    }
-}
-
-impl core::hash::Hash for StableMap {
-    fn hash<H: std::hash::Hasher>(&self, _state: &mut H) {
-        todo!()
-    }
-}
-
-// Rust-Motoko bindings
 impl Dynamic for StableMap {
     fn get_index(&self, _core: &Core, index: Shared<Value>) -> Result {
         let result = (&*self.0).borrow().get(&index.to_rust()?);
@@ -85,5 +66,28 @@ impl Dynamic for StableMap {
                 .insert(index.to_rust()?, value.to_rust()?),
         );
         Ok(())
+    }
+}
+
+// TODO: remove once `StableBTreeMap` implements `Clone`
+impl Clone for StableMap {
+    fn clone(&self) -> Self {
+        StableMap(self.0.clone())
+    }
+}
+
+
+// TODO: remove once `StableBTreeMap` implements `Debug`
+impl core::fmt::Debug for StableMap {
+    fn fmt(&self, _f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        todo!()
+    }
+}
+
+
+// TODO: remove once `StableBTreeMap` implements `Hash`
+impl core::hash::Hash for StableMap {
+    fn hash<H: std::hash::Hasher>(&self, _state: &mut H) {
+        todo!()
     }
 }
