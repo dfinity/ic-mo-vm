@@ -13,5 +13,5 @@ candid = "0.8.2"
 ic-cdk = "0.6.0"
 ic-cdk-macros = "0.6.0"
 ic-stable-structures = "0.1.1"
-motoko = { branch = "main" , git = "https://github.com/dfinity/motoko.rs" }
+motoko = { git = "https://github.com/dfinity/motoko.rs", branch = "main" }
 # motoko_proc_macro = { git = "https://github.com/dfinity/motoko.rs", branch = "main" }
