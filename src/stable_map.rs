@@ -76,14 +76,12 @@ impl Clone for StableMap {
     }
 }
 
-
 // TODO: remove once `StableBTreeMap` implements `Debug`
 impl core::fmt::Debug for StableMap {
     fn fmt(&self, _f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         todo!()
     }
 }
-
 
 // TODO: remove once `StableBTreeMap` implements `Hash`
 impl core::hash::Hash for StableMap {
