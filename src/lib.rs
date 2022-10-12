@@ -10,8 +10,7 @@ thread_local! {
     // Initialize a MoVM core with a global `StableBTreeMap`.
     static CORE: RefCell<Core> = RefCell::new({
         let mut core = Core::empty();
-        let ptr = core.alloc(stable_map::StableMap::shared(MAX_KEY_SIZE, MAX_VALUE_SIZE));
-        core.assign_alloc("stableMap", motoko::value::Value::Pointer(ptr));
+        core.assign_alloc("stableMap", stable_map::StableMap::shared(MAX_KEY_SIZE, MAX_VALUE_SIZE));
         core.assign("newStableMap", stable_map::NewStableMap.into_value());
         core
     });
