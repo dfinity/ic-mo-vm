@@ -3,7 +3,6 @@ use ic_stable_structures::{DefaultMemoryImpl, StableBTreeMap};
 use motoko::dynamic::Result;
 use motoko::{Core, Dynamic, Share, Shared, Value};
 use std::cell::RefCell;
-use std::rc::Rc;
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -24,7 +23,7 @@ impl Dynamic for NewStableMap {
 }
 
 // Stable map container for MoVM
-pub struct StableMap(Rc<RefCell<StableBTreeMap<Memory, String, Vec<u8>>>>);
+pub struct StableMap(StableBTreeMap<Memory, String, Vec<u8>>);
 
 impl StableMap {
     pub fn shared(max_key_size: u32, max_value_size: u32) -> Shared<Value> {
@@ -39,13 +38,13 @@ impl StableMap {
             max_value_size,
         );
 
-        StableMap(Rc::new(RefCell::new(map))).into_value().share()
+        StableMap(map).into_value().share()
     }
 }
 
 impl Dynamic for StableMap {
     fn get_index(&self, _core: &Core, index: Shared<Value>) -> Result {
-        let result = (&*self.0).borrow().get(&index.to_rust()?);
+        let result = self.0.get(&index.to_rust()?);
 
         Ok(match result {
             Some(vec) => Value::Option(Value::Blob(vec).share()),
@@ -60,11 +59,7 @@ impl Dynamic for StableMap {
         index: Shared<Value>,
         value: Shared<Value>,
     ) -> Result<()> {
-        drop(
-            (&*self.0)
-                .borrow_mut()
-                .insert(index.to_rust()?, value.to_rust()?),
-        );
+        drop(self.0.insert(index.to_rust()?, value.to_rust()?));
         Ok(())
     }
 }
@@ -72,7 +67,7 @@ impl Dynamic for StableMap {
 // TODO: remove once `StableBTreeMap` implements `Clone`
 impl Clone for StableMap {
     fn clone(&self) -> Self {
-        StableMap(self.0.clone())
+        todo!()
     }
 }
 
