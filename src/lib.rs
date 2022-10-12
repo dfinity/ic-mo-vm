@@ -1,4 +1,4 @@
-use motoko::{parse, Dynamic, Core};
+use motoko::{parse, Core, Dynamic};
 use std::cell::RefCell;
 
 mod stable_map;
@@ -19,9 +19,9 @@ thread_local! {
 
 fn eval_(prog: String) -> String {
     CORE.with(|core| {
-        let p = parse(&prog).expect("parse error");
-        let result_val = core.borrow_mut().eval_prog(p).expect("eval error");
-        format!("{:?}", result_val)
+        let prog = parse(&prog).expect("parse error");
+        let result = core.borrow_mut().eval_prog(prog).expect("eval error");
+        format!("{:?}", result)
     })
 }
 
