@@ -5,12 +5,13 @@ authors = ["Human"]
 edition = "2018"
 
 [lib]
-path = "lib.rs"
+path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-candid = "0.7.16"
-ic-cdk = "0.5.6"
-ic-cdk-macros = "0.5.6"
+candid = "0.8.2"
+ic-cdk = "0.6.0"
+ic-cdk-macros = "0.6.0"
+ic-stable-structures = "0.1.1"
 motoko = { branch = "main" , git = "https://github.com/dfinity/motoko.rs" }
 # motoko_proc_macro = { git = "https://github.com/dfinity/motoko.rs", branch = "main" }
