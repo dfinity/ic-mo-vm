@@ -28,7 +28,7 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            service/wasm-utils/target
+            target
           key: cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Install dfx
         run: |
