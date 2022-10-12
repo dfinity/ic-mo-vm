@@ -6,7 +6,7 @@ use std::cell::RefCell;
 
 use motoko::dynamic::{Dynamic, Result};
 use motoko::shared::{Share, Shared};
-use motoko::value::{ToMotoko, Value};
+use motoko::value::Value;
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -51,11 +51,16 @@ impl core::hash::Hash for StableMap {
 // Rust-Motoko bindings
 impl Dynamic for StableMap {
     fn get_index(&self, index: Shared<Value>) -> Result {
-        self.0
+        let result = self
+            .0
             .borrow()
-            .get(&index.to_rust().map_err(Interruption::ValueError)?)
-            .to_shared()
-            .map_err(Interruption::ValueError)
+            .get(&index.to_rust().map_err(Interruption::ValueError)?);
+
+        Ok(match result {
+            Some(vec) => Value::Option(Value::Blob(vec).share()),
+            None => Value::Null,
+        }
+        .share())
     }
 
     fn set_index(&mut self, index: Shared<Value>, value: Shared<Value>) -> Result<()> {
