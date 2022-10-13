@@ -1,0 +1,35 @@
+name: Canister
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DFX_VERSION: 0.11.2
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          target: wasm32-unknown-unknown
+      - name: Install dfx
+        run: |
+          echo y | DFX_VERSION=$DFX_VERSION bash -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+      - name: Start dfx
+        run: |
+          dfx cache install
+          dfx start --background
+      - name: Deploy current branch
+        run: dfx deploy
+      - name: Stop dfx
+        run: dfx stop

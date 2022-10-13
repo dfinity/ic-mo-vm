@@ -1,7 +1,7 @@
 {
   "canisters": {
     "ic_mo_vm": {
-      "candid": "ic-mo-vm.did",
+      "candid": "ic_mo_vm.did",
       "package": "ic_mo_vm",
       "type": "rust"
     }

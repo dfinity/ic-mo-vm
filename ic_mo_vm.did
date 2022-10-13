@@ -1,5 +1,5 @@
 service : {
     "eval": (text) -> (text);
-    "eval_q": (text) -> (text) query;
+    "eval_query": (text) -> (text) query;
     "reset": () -> ();
 }
