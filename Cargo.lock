@@ -574,7 +574,7 @@ checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
 [[package]]
 name = "motoko"
 version = "0.0.18"
-source = "git+https://github.com/dfinity/motoko.rs?branch=dynamic-ux#17fbab6c6400d70890e945f29d67a1e92ba655c0"
+source = "git+https://github.com/dfinity/motoko.rs?branch=main#428e360615a60494d373dcec3b6237c4df8ac676"
 dependencies = [
  "dyn-clone",
  "env_logger",
